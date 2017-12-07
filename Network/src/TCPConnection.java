@@ -12,6 +12,12 @@ public class TCPConnection {
     private TCPConnectionEventListener eventListener;
 
 
+
+    public TCPConnection(String hostname, int portNumber, TCPConnectionEventListener eventListener) throws IOException {
+       this(new Socket(hostname, portNumber), eventListener);
+
+    }
+
     public TCPConnection(Socket sckt, TCPConnectionEventListener eventListener) {
         this.socket = sckt;
         this.eventListener = eventListener;
@@ -49,7 +55,7 @@ public class TCPConnection {
 
 
 
-    private void disconnect(TCPConnection tcpConnection) {
+    public void disconnect(TCPConnection tcpConnection) {
         System.out.println("Terminating TCP connection: "+tcpConnection);
         Thread.currentThread().interrupt();
     }
