@@ -32,6 +32,7 @@ public class ClientWindow extends JFrame implements TCPConnectionEventListener {
         tcpConnection =  establishConnection(HOST, PORT);
         tcpConnection.sendString("aasdw");
         tcpConnection.disconnect(tcpConnection);
+        //end here
 
 
     }
