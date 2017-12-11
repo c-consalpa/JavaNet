@@ -9,6 +9,7 @@ public class ChatServer implements TCPConnectionEventListener {
     public static void main(String[] args) {
         new ChatServer();
     }
+
     private ServerSocket serverSocket;
     private ArrayList<TCPConnection> activeConnections = new ArrayList<>();
 
@@ -37,8 +38,8 @@ public class ChatServer implements TCPConnectionEventListener {
     }
 
     @Override
-    public void onReceiveMessage(TCPConnection tcpConnection, String message) {
-        String tmp = "Message received : \""+ message+"\" from: "+tcpConnection;
+    public synchronized void onReceiveMessage(TCPConnection tcpConnection, String message) {
+        String tmp = "received : \""+ message+"\" from: "+tcpConnection+" Thread: "+Thread.currentThread().getName();
         System.out.println(tmp);
         responseToAll(message);
     }
@@ -46,13 +47,12 @@ public class ChatServer implements TCPConnectionEventListener {
     @Override
     public void onConnectionEstablished(TCPConnection tcpConnection) {
         activeConnections.add(tcpConnection);
-        logEvent("Client connected to the server: "+ tcpConnection);
-        logEvent("Current active connections: "+ activeConnections.size());
+        logEvent("Client connected: "+ tcpConnection + ", active: "+activeConnections.size());
     }
 
     @Override
     public void onError(Exception e) {
-
+        logEvent("error occured: "+e);
     }
 
     @Override
