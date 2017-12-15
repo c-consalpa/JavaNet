@@ -9,7 +9,7 @@ public class TCPConnection {
     private Thread rxThread;
     private BufferedReader in;
     private BufferedWriter out;
-    private TCPConnectionEventListener TeventListener;
+    private TCPConnectionEventListener TCPeventListener;
 
 
 
@@ -19,8 +19,8 @@ public class TCPConnection {
 
     public TCPConnection(Socket sckt, TCPConnectionEventListener eventListener) {
         this.socket = sckt;
-        this.TeventListener = eventListener;
-        TeventListener.onConnectionEstablished(this);
+        this.TCPeventListener = eventListener;
+        TCPeventListener.onConnectionEstablished(this);
 
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -38,18 +38,11 @@ public class TCPConnection {
                 String line="";
                 try {
                     while ((line=in.readLine())!=null){
-                        if(line.equals("\\q")) {
-                            in.close();
-                            out.close();
-                            socket.close();
-                            Thread.currentThread().interrupt();
+                        if(catchTCPCloseCommand(line)){
                             break;
                         }
-                        eventListener.onReceiveMessage(TCPConnection.this, line);
+                        TCPeventListener.onReceiveMessage(TCPConnection.this, line);
                     }
-                    System.out.println("EOF reached");
-
-                    TeventListener.onDisconnect(TCPConnection.this);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -60,7 +53,17 @@ public class TCPConnection {
 
 
 
-
+    private boolean catchTCPCloseCommand(String line) throws IOException {
+        if (line.equals("/q")) {
+                in.close();
+                out.close();
+                socket.close();
+                Thread.currentThread().interrupt();
+                return true;
+        } else {
+            return false;
+        }
+    }
 
     public void disconnect() throws IOException {
         System.out.println("Terminating TCP connection: "+ this);
@@ -70,15 +73,13 @@ public class TCPConnection {
         in.close();
         out.close();
         socket.close();
-
         Thread.currentThread().interrupt();
-
     }
 
-//    @Override
-//    public String toString() {
-//        return socket.getInetAddress() + ": " + socket.getPort();
-//    }
+    @Override
+    public String toString() {
+        return socket.getInetAddress() + ": " + socket.getPort();
+    }
 
     public void sendString(String str) {
         try {

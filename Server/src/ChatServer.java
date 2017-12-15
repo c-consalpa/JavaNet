@@ -34,8 +34,8 @@ public class ChatServer implements TCPConnectionEventListener {
                 e.printStackTrace();
             }
         }
-
     }
+
 
     @Override
     public synchronized void onReceiveMessage(TCPConnection tcpConnection, String message) {
